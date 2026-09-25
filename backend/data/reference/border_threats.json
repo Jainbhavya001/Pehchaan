@@ -1,0 +1,73 @@
+{
+  "_meta": {
+    "source": "DS-028 to DS-034: Border infiltration, apprehension, and threat data",
+    "origin": "data.gov.in / MHA",
+    "description": "Border-wise threat levels derived from infiltration cases, apprehension data, and firing incidents"
+  },
+  "borders": [
+    {
+      "border": "Indo-Pakistan",
+      "threat_level": "high",
+      "infiltration_total": 1482,
+      "years_covered": "2017–2021",
+      "monthly_peak": "Oct",
+      "notes": "Western border — highest infiltration attempts, active ceasefire violations"
+    },
+    {
+      "border": "Indo-Bangladesh",
+      "threat_level": "high",
+      "infiltration_total": 3426,
+      "years_covered": "2016–2021",
+      "monthly_peak": "Mar",
+      "apprehensions": 2843,
+      "notes": "Eastern border — highest illegal crossing volume, drug seizure corridor"
+    },
+    {
+      "border": "Indo-Nepal",
+      "threat_level": "medium",
+      "infiltration_total": 0,
+      "years_covered": "2017–2021",
+      "monthly_peak": null,
+      "notes": "Open border — no infiltration tracking but document verification critical for identity fraud"
+    },
+    {
+      "border": "Indo-Myanmar",
+      "threat_level": "medium",
+      "infiltration_total": 215,
+      "years_covered": "2017–2021",
+      "monthly_peak": "Jun",
+      "notes": "Northeastern border — insurgent corridor, FMR (Free Movement Regime) abuse"
+    },
+    {
+      "border": "Indo-China",
+      "threat_level": "medium",
+      "infiltration_total": 0,
+      "years_covered": "2017–2021",
+      "monthly_peak": null,
+      "notes": "LAC — military-grade border, negligible civilian crossing"
+    },
+    {
+      "border": "Indo-Bhutan",
+      "threat_level": "low",
+      "infiltration_total": 0,
+      "years_covered": "2017–2021",
+      "monthly_peak": null,
+      "notes": "Friendly border — treaty-based open movement, minimal document fraud"
+    }
+  ],
+  "indo_bangladesh_yearly": [
+    {"year": 2016, "apprehended": 478},
+    {"year": 2017, "apprehended": 521},
+    {"year": 2018, "apprehended": 617},
+    {"year": 2019, "apprehended": 698},
+    {"year": 2020, "apprehended": 529}
+  ],
+  "bsf_drug_seizures": [
+    {"year": 2017, "cases": 1021, "heroin_kg": 42.3, "phensedyl_bottles": 245811},
+    {"year": 2018, "cases": 1183, "heroin_kg": 58.7, "phensedyl_bottles": 312046},
+    {"year": 2019, "cases": 1302, "heroin_kg": 67.1, "phensedyl_bottles": 287193},
+    {"year": 2020, "cases": 1078, "heroin_kg": 71.4, "phensedyl_bottles": 198452},
+    {"year": 2021, "cases": 1245, "heroin_kg": 84.2, "phensedyl_bottles": 221307},
+    {"year": 2022, "cases": 1389, "heroin_kg": 92.6, "phensedyl_bottles": 256891}
+  ]
+}
