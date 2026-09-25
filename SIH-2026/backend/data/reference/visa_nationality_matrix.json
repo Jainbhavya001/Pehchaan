@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "source": "DS-006: Issuance of VISA to Foreign Nationals by Category (2014)",
+    "origin": "data.gov.in / Dept of Home",
+    "description": "Nationality × visa-type matrix. Countries with 0 issuances for a visa type suggest unusual/suspicious combinations."
+  },
+  "visa_types": ["Tourist", "Business", "Employment", "Student", "Medical", "Conference", "Research", "Transit", "Journalist", "Diplomatic"],
+  "matrix": [
+    {"nationality": "USA", "common_types": ["Tourist", "Business", "Student", "Conference", "Research"], "rare_types": ["Employment", "Transit"]},
+    {"nationality": "GBR", "common_types": ["Tourist", "Business", "Student", "Research"], "rare_types": ["Transit"]},
+    {"nationality": "DEU", "common_types": ["Tourist", "Business", "Conference", "Research"], "rare_types": ["Employment"]},
+    {"nationality": "FRA", "common_types": ["Tourist", "Business", "Conference", "Research"], "rare_types": ["Employment"]},
+    {"nationality": "JPN", "common_types": ["Tourist", "Business", "Conference"], "rare_types": ["Student", "Employment"]},
+    {"nationality": "KOR", "common_types": ["Tourist", "Business", "Medical"], "rare_types": ["Student"]},
+    {"nationality": "CHN", "common_types": ["Tourist", "Business", "Student", "Research"], "rare_types": ["Medical"]},
+    {"nationality": "RUS", "common_types": ["Tourist", "Business", "Medical"], "rare_types": ["Student"]},
+    {"nationality": "AUS", "common_types": ["Tourist", "Business", "Student", "Research"], "rare_types": ["Transit"]},
+    {"nationality": "CAN", "common_types": ["Tourist", "Business", "Student", "Research"], "rare_types": ["Transit"]},
+    {"nationality": "BGD", "common_types": ["Tourist", "Business", "Medical", "Student", "Employment"], "rare_types": ["Research", "Conference"]},
+    {"nationality": "NPL", "common_types": ["Tourist", "Medical", "Student", "Employment"], "rare_types": ["Research", "Diplomatic"]},
+    {"nationality": "LKA", "common_types": ["Tourist", "Business", "Medical", "Student"], "rare_types": ["Research"]},
+    {"nationality": "PAK", "common_types": ["Tourist", "Business", "Medical"], "rare_types": ["Student", "Research"]},
+    {"nationality": "AFG", "common_types": ["Medical", "Student", "Tourist"], "rare_types": ["Business", "Conference"]},
+    {"nationality": "ARE", "common_types": ["Tourist", "Business"], "rare_types": ["Student", "Medical"]},
+    {"nationality": "SAU", "common_types": ["Tourist", "Business", "Medical"], "rare_types": ["Student"]},
+    {"nationality": "SGP", "common_types": ["Tourist", "Business", "Conference"], "rare_types": ["Employment"]},
+    {"nationality": "MYS", "common_types": ["Tourist", "Business", "Medical"], "rare_types": ["Research"]},
+    {"nationality": "THA", "common_types": ["Tourist", "Business", "Medical"], "rare_types": ["Student"]},
+    {"nationality": "IDN", "common_types": ["Tourist", "Business", "Student"], "rare_types": ["Medical"]},
+    {"nationality": "PHL", "common_types": ["Tourist", "Business", "Employment"], "rare_types": ["Research"]},
+    {"nationality": "VNM", "common_types": ["Tourist", "Business", "Medical"], "rare_types": ["Research"]},
+    {"nationality": "NGA", "common_types": ["Student", "Business", "Medical"], "rare_types": ["Tourist"]},
+    {"nationality": "KEN", "common_types": ["Student", "Business", "Tourist"], "rare_types": ["Medical"]},
+    {"nationality": "ZAF", "common_types": ["Tourist", "Business", "Student"], "rare_types": ["Medical"]},
+    {"nationality": "BRA", "common_types": ["Tourist", "Business", "Student"], "rare_types": ["Medical"]},
+    {"nationality": "MEX", "common_types": ["Tourist", "Business"], "rare_types": ["Student", "Medical"]},
+    {"nationality": "ISR", "common_types": ["Tourist", "Business", "Research"], "rare_types": ["Student"]},
+    {"nationality": "IRN", "common_types": ["Medical", "Student", "Tourist"], "rare_types": ["Business"]}
+  ]
+}

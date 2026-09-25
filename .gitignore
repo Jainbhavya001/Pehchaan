@@ -1,0 +1,239 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+*.whl
+
+# Python packages
+*.egg
+pip-wheel-metadata/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Vite / Frontend build
+dist/
+build/
+*.local
+
+# Environment files (keep .env.example but not .env)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads / Generated files
+uploads/
+backend/uploads/
+*.jpg
+*.jpeg
+*.png
+*.pdf
+*.heic
+
+# Model files (large binary files)
+*.pth
+*.onnx
+*.pt
+*.bin
+*.model
+*.weights
+model_manifest.json
+
+# Training outputs
+training/*.json
+training/checkpoints/
+*.metrics.json
+
+# IDE / Editor specific
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+
+# Secrets / Keys (never commit)
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+
+# Coverage reports
+coverage/
+.coverage
+
+# Profiler output
+*.prof
+
+# Docker
+docker-compose.override.yml
+
+# IDE-specific
+.project
+.classpath
+.settings/
+*.iml
+*.ipr
+*.iws
+
+# Misc
+*.orig
+*.bak
+*.backup
+
+# Frontend specific
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Backend specific
+backend/.env
+backend/.env.local
+backend/.venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.pytest_cache/
+
+# Test artifacts
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+.cache/
+
+# Misc
+*.tgz
+*.tar.gz
+
+# ========== PROJECT SPECIFIC ==========
+# Dataset directories (large binary files)
+DATASET/
+DATASET.zip
+
+# Document files (templates, presentations, reports)
+*.docx
+*.pptx
+*.pdf
+
+# Excel/Spreadsheet files
+*.xlsx
+*.xls
+*.csv
+
+# Image files
+*.jpeg
+*.jpg
+*.png
+*.heic
+
+# Temporary/backup files
+*~
+*.tmp
+*.backup
+*.bak
+nul
+
+# OS temporary directories
+%TEMP%/
+%USERPROFILE%/
+
+# IDE/Editor directories
+_removed_apisetu/
+
+# Zip archives
+*.zip
+
+# Large reference files
+reference file.pdf
+
+# Session reports and markdown docs (if not needed in repo)
+Pehchaan-Session-Report.md
+SESSION-SUMMARY.md
+PROJECT-STATUS.md
+BIBLIOGRAPHY.md
+
+# Presentation files
+Pehchaan-SIH2026-Idea-Presentation.pptx
+Pehchaan-SIH2026-Idea-Presentation.pdf
+SIH2026-IDEA-Presentation-Format.pptx
+AI-POWERED PASSPORT AUTHENTICITY ENGINE.pptx
+AI-POWERED PASSPORT AUTHENTICITY ENGINE2.pptx
+AI-POWERED PASSPORT AUTHENTICITY ENGINE (2).pdf
+
+# Other project files
+brutal audit.pdf
+BRUTAL AUDIT.docx
+4 sawal.docx
+4sawal.pdf
+Aadhaar_Blank_Template.docx
+PAN_Card_Blank_Template.docx
+Passport_Stacked_OneAboveOther.docx
+Synthetic_Indian_Passport_Blank_Template.docx
+passport_template.jpeg
+WhatsApp Image 2026-09-16 at 2.17.10 PM.jpeg
+mock_government_ids_300_entries.xlsx
+
+# Lock files
+~$*.pptx
+~$*.docx

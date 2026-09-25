@@ -1,0 +1,32 @@
+{
+  "id": "/",
+  "name": "PEHCHAAN — AI Identity Screening",
+  "short_name": "PEHCHAAN",
+  "description": "AI-powered fake identity and document screening for border checkpoints with remote store-and-forward Neon database sync.",
+  "theme_color": "#0c1017",
+  "background_color": "#0c1017",
+  "display": "standalone",
+  "orientation": "any",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

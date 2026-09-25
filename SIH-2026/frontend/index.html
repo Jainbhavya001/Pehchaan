@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="theme-color" content="#0c1017" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PEHCHAAN" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <title>PEHCHAAN — AI Identity & Document Screening</title>
+    <meta name="description" content="AI-powered fake identity and document screening system for border checkpoints with multi-spectral tamper diagnostics, ICAO 9303 checksum analysis, and biometric verification." />
+    <meta property="og:title" content="PEHCHAAN — AI Identity & Document Screening" />
+    <meta property="og:description" content="AI-powered fake identity and document screening system for border checkpoints with multi-spectral tamper diagnostics, ICAO 9303 checksum analysis, and biometric verification." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-preview.png" />
+    <meta property="og:url" content="https://pehchaan.gov.in/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og-preview.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link rel="manifest" href="/manifest.json" />
+  </head>
+  <body class="bg-[#faf8fe] text-[#1a1b1f] antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.warn('SW registration skipped:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
+
