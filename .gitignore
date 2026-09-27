@@ -140,6 +140,12 @@ SIH-2026/frontend/brag-output/
 SIH-2026/sample-data/**
 !SIH-2026/sample-data/README.md
 
+# Personal reference material moved out of the repo root. Ignored as a whole
+# directory so a new file type dropped in here does not become untracked
+# noise - the extension rules below would otherwise be the only thing
+# covering it.
+archive/
+
 # Presentations, blank ID templates and chat images parked at the repo root.
 *.pptx
 *.docx
