@@ -165,11 +165,84 @@ export async function addCheckpoint(body: any) {
   const id = String(body?.id || '').trim().toUpperCase();
   const name = String(body?.name || '').trim();
   if (!/^[A-Z0-9-]{2,32}$/.test(id) || !name) throw Object.assign(new Error('Checkpoint ID (A-Z, 0-9, -) and name are required.'), { status: 400 });
+  const num = (v: unknown) => (v === '' || v === null || v === undefined ? null : Number(v));
+  const lat = num(body?.latitude), lng = num(body?.longitude), radius = num(body?.radiusKm) ?? 5;
+  if ((lat !== null && (!Number.isFinite(lat) || Math.abs(lat) > 90)) || (lng !== null && (!Number.isFinite(lng) || Math.abs(lng) > 180))) {
+    throw Object.assign(new Error('Latitude must be −90…90 and longitude −180…180.'), { status: 400 });
+  }
+  if (!Number.isFinite(radius) || radius <= 0 || radius > 200) throw Object.assign(new Error('Radius must be 0–200 km.'), { status: 400 });
   const pool = await db();
   await pool.query(
-    'INSERT INTO pehchaan_checkpoints (id, name, location, type) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, location = EXCLUDED.location',
-    [id, name, body?.location || null, body?.type || null],
+    `INSERT INTO pehchaan_checkpoints (id, name, location, type, latitude, longitude, radius_km) VALUES ($1,$2,$3,$4,$5,$6,$7)
+     ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, location = EXCLUDED.location,
+       latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, radius_km = EXCLUDED.radius_km`,
+    [id, name, body?.location || null, body?.type || null, lat, lng, radius],
   );
+}
+
+// ---- Automatic checkpoint from device location ----
+
+function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const h = Math.sin(rad(bLat - aLat) / 2) ** 2 +
+    Math.cos(rad(aLat)) * Math.cos(rad(bLat)) * Math.sin(rad(bLng - aLng) / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
+export interface ResolvedCheckpoint {
+  id: string;
+  name: string;
+  location?: string | null;
+  method: 'gps' | 'gps-outside-radius' | 'only-assignment' | 'global' | 'fallback';
+  distanceKm?: number;
+  accuracyM?: number;
+  note: string;
+}
+
+/**
+ * Picks the user's checkpoint from the device location. The location comes
+ * from the browser and can be spoofed, so the choice is always limited to
+ * checkpoints the account is already assigned to; the device only decides
+ * *which* of those. Every resolution is written to the system log.
+ */
+export async function resolveCheckpoint(user: AuthPayload, body: any): Promise<ResolvedCheckpoint> {
+  const pool = await db();
+  const all = (await pool.query('SELECT id, name, location, latitude, longitude, COALESCE(radius_km, 5) AS radius_km FROM pehchaan_checkpoints')).rows;
+  const scope = scopeOf(user);
+  const allowed = scope === null ? all : all.filter((c: any) => scope.includes(c.id));
+  const lat = Number(body?.latitude), lng = Number(body?.longitude);
+  const accuracyM = Number.isFinite(Number(body?.accuracy)) ? Math.round(Number(body.accuracy)) : undefined;
+  const hasFix = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+
+  if (hasFix) {
+    const located = allowed
+      .filter((c: any) => c.latitude !== null && c.longitude !== null)
+      .map((c: any) => ({ c, d: distanceKm(lat, lng, c.latitude, c.longitude) }))
+      .sort((a: any, b: any) => a.d - b.d);
+    const nearest = located[0];
+    if (nearest && nearest.d <= nearest.c.radius_km) {
+      return { id: nearest.c.id, name: nearest.c.name, location: nearest.c.location, method: 'gps',
+        distanceKm: Math.round(nearest.d * 10) / 10, accuracyM, note: `Detected from device location (${nearest.d.toFixed(1)} km away).` };
+    }
+    if (user.role !== 'ADMIN' && allowed.length === 1) {
+      const c = allowed[0];
+      return { id: c.id, name: c.name, location: c.location, method: 'gps-outside-radius', accuracyM,
+        distanceKm: nearest ? Math.round(nearest.d * 10) / 10 : undefined,
+        note: nearest ? `You appear to be ${nearest.d.toFixed(1)} km from your assigned checkpoint.` : 'Your assigned checkpoint has no coordinates set.' };
+    }
+  }
+  if (user.role === 'ADMIN') {
+    return { id: 'GLOBAL', name: 'Global Scope', method: 'global', accuracyM,
+      note: hasFix ? 'Not at a checkpoint — admin working in global scope.' : 'Location unavailable — admin working in global scope.' };
+  }
+  if (allowed.length === 1) {
+    const c = allowed[0];
+    return { id: c.id, name: c.name, location: c.location, method: 'only-assignment', note: 'Your only assigned checkpoint.' };
+  }
+  if (allowed.length === 0) throw Object.assign(new Error('No checkpoint is assigned to your account. Ask an administrator.'), { status: 403 });
+  const c = allowed[0];
+  return { id: c.id, name: c.name, location: c.location, method: 'fallback',
+    note: hasFix ? 'You are not within range of any assigned checkpoint; confirm the checkpoint in the header.' : 'Location unavailable; confirm the checkpoint in the header.' };
 }
 
 // ---- Checkpoint scoping ----

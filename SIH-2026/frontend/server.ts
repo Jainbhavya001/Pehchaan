@@ -43,6 +43,7 @@ import {
   inScope,
   listUsers,
   resetUserPassword,
+  resolveCheckpoint,
   scopeOf,
   securityStartup,
   setUserActive,
@@ -156,7 +157,7 @@ async function startServer() {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=()');
+    res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(self)');
     next();
   });
 
@@ -271,6 +272,17 @@ async function startServer() {
       res.status(500).json({ error: err?.message || 'Failed to fetch checkpoints' });
     }
   });
+
+  // Automatic checkpoint from the device location (limited to the user's assignments)
+  app.post('/api/checkpoints/resolve', authMiddleware, handle(async (req) => {
+    const user = req.authUser!;
+    const out = await resolveCheckpoint(user, req.body);
+    await insertSystemLog({
+      actor: user.name, role: user.role, checkpoint: out.id, event: 'checkpoint_resolved', status: out.method,
+      reference_id: out.distanceKm !== undefined ? `${out.distanceKm} km` : undefined,
+    });
+    return out;
+  }));
 
   // System Logs (ADMIN only)
   app.get('/api/system-logs', authMiddleware, requireRole('ADMIN'), async (req, res) => {

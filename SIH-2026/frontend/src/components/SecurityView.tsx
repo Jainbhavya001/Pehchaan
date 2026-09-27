@@ -79,7 +79,7 @@ const UsersTab: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [secret, setSecret] = useState<{ who: string; password: string } | null>(null);
   const [form, setForm] = useState({ name: '', email: '', role: 'OFFICER', checkpointIds: [] as string[] });
-  const [cpForm, setCpForm] = useState({ id: '', name: '', location: '' });
+  const [cpForm, setCpForm] = useState({ id: '', name: '', location: '', latitude: '', longitude: '', radiusKm: '5' });
 
   const load = useCallback(async () => {
     try {
@@ -111,7 +111,7 @@ const UsersTab: React.FC = () => {
   };
   const saveCheckpoint = async (e: React.FormEvent) => {
     e.preventDefault();
-    try { await api('/api/admin/checkpoints', { method: 'POST', body: JSON.stringify(cpForm) }); setCpForm({ id: '', name: '', location: '' }); load(); }
+    try { await api('/api/admin/checkpoints', { method: 'POST', body: JSON.stringify(cpForm) }); setCpForm({ id: '', name: '', location: '', latitude: '', longitude: '', radiusKm: '5' }); load(); }
     catch (err: any) { setError(err.message); }
   };
 
@@ -181,13 +181,34 @@ const UsersTab: React.FC = () => {
         </Panel>
         <Panel title={`Checkpoints (${checkpoints.length})`}>
           <ul className="text-xs space-y-1">
-            {checkpoints.map((cp) => <li key={cp.id}><span className="font-mono">{cp.id}</span> — {cp.name}{cp.location ? `, ${cp.location}` : ''}</li>)}
+            {checkpoints.map((cp) => (
+              <li key={cp.id} className="flex flex-wrap gap-x-2">
+                <button type="button" className="font-mono text-[#0059b5] hover:underline"
+                  onClick={() => setCpForm({ id: cp.id, name: cp.name, location: cp.location || '', latitude: cp.latitude?.toString() ?? '', longitude: cp.longitude?.toString() ?? '', radiusKm: (cp.radius_km ?? 5).toString() })}>
+                  {cp.id}
+                </button>
+                <span>{cp.name}{cp.location ? `, ${cp.location}` : ''}</span>
+                <span className={cp.latitude != null ? 'text-[#006a26]' : 'text-[#8a5600]'}>
+                  {cp.latitude != null ? `${cp.latitude.toFixed(4)}, ${cp.longitude?.toFixed(4)} · ${cp.radius_km ?? 5} km` : 'no coordinates — cannot be auto-detected'}
+                </span>
+              </li>
+            ))}
           </ul>
           <form onSubmit={saveCheckpoint} className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-[#efedf3]">
             <input aria-label="Checkpoint ID" required placeholder="ID, e.g. ICP-RAXAUL" value={cpForm.id} onChange={(e) => setCpForm({ ...cpForm, id: e.target.value })} className={field} />
             <input aria-label="Checkpoint name" required placeholder="Name" value={cpForm.name} onChange={(e) => setCpForm({ ...cpForm, name: e.target.value })} className={field} />
             <input aria-label="Location" placeholder="Location" value={cpForm.location} onChange={(e) => setCpForm({ ...cpForm, location: e.target.value })} className={field} />
-            <button type="submit" className="btn-secondary sm:col-span-3 w-fit">Save checkpoint</button>
+            <input aria-label="Latitude" inputMode="decimal" placeholder="Latitude, e.g. 26.9853" value={cpForm.latitude} onChange={(e) => setCpForm({ ...cpForm, latitude: e.target.value })} className={field} />
+            <input aria-label="Longitude" inputMode="decimal" placeholder="Longitude, e.g. 84.8554" value={cpForm.longitude} onChange={(e) => setCpForm({ ...cpForm, longitude: e.target.value })} className={field} />
+            <input aria-label="Detection radius in km" inputMode="decimal" placeholder="Radius km" value={cpForm.radiusKm} onChange={(e) => setCpForm({ ...cpForm, radiusKm: e.target.value })} className={field} />
+            <div className="sm:col-span-3 flex flex-wrap items-center gap-2">
+              <button type="submit" className="btn-secondary">Save checkpoint</button>
+              <button type="button" className="btn-ghost" onClick={() => navigator.geolocation?.getCurrentPosition(
+                (pos) => setCpForm((f) => ({ ...f, latitude: pos.coords.latitude.toFixed(6), longitude: pos.coords.longitude.toFixed(6) })),
+                () => setError('Location permission was denied or unavailable.'),
+              )}>Use my current location</button>
+              <span className="text-[11px] text-[#5d6370]">Officers inside the radius are placed at this checkpoint automatically. Click an ID to edit it.</span>
+            </div>
           </form>
         </Panel>
       </div>

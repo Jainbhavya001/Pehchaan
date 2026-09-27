@@ -215,6 +215,9 @@ async function createSchema(): Promise<boolean> {
         CREATE INDEX IF NOT EXISTS idx_scans_doc_hash ON pehchaan_scans (doc_number_hash);
         ALTER TABLE pehchaan_users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT false;
         ALTER TABLE pehchaan_users ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT true;
+        ALTER TABLE pehchaan_checkpoints ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION;
+        ALTER TABLE pehchaan_checkpoints ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION;
+        ALTER TABLE pehchaan_checkpoints ADD COLUMN IF NOT EXISTS radius_km DOUBLE PRECISION DEFAULT 5;
 
         CREATE TABLE IF NOT EXISTS pehchaan_decisions (
           id SERIAL PRIMARY KEY,

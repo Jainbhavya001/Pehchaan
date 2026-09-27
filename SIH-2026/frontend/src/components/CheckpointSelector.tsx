@@ -1,96 +1,77 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useI18n } from '../contexts/I18nContext';
 import { Checkpoint } from '../types';
 
+type Fix = { latitude: number; longitude: number; accuracy: number } | null;
+
+function currentPosition(timeoutMs: number): Promise<Fix> {
+  return new Promise((resolve) => {
+    if (!('geolocation' in navigator)) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy }),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: timeoutMs, maximumAge: 5 * 60 * 1000 },
+    );
+  });
+}
+
+/** Resolves the checkpoint from the device location; the server limits the
+ *  choice to checkpoints assigned to the account. */
+export async function detectCheckpoint(token: string): Promise<Checkpoint> {
+  const fix = await currentPosition(8000);
+  const res = await fetch('/api/checkpoints/resolve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(fix || {}),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || 'Could not determine your checkpoint.');
+  return {
+    id: body.id, name: body.name, location: body.location || undefined,
+    detection: { method: body.method, distanceKm: body.distanceKm, accuracyM: body.accuracyM, note: body.note },
+  };
+}
+
+/** Shown briefly after sign-in while the checkpoint is detected. */
 export const CheckpointSelector: React.FC = () => {
-  const { user, selectCheckpoint, token, isAdmin } = useAuth();
-  const { t } = useI18n();
-  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { token, user, selectCheckpoint, logout } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const started = useRef(false);
+
+  const run = () => {
+    if (!token) return;
+    setError(null);
+    detectCheckpoint(token).then(selectCheckpoint).catch((e) => setError(e.message));
+  };
 
   useEffect(() => {
-    if (!token) return;
-    fetch('/api/checkpoints', {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
-      .then(res => res.ok ? res.json() : [])
-      .then(setCheckpoints)
-      .catch(() => setCheckpoints([]))
-      .finally(() => setLoading(false));
-  }, [token]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0c1017] flex items-center justify-center">
-        <div className="text-[#8a94a6] text-sm">Loading checkpoints...</div>
-      </div>
-    );
-  }
+    if (started.current) return;
+    started.current = true;
+    run();
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-[#0c1017] flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        <div className="text-center mb-8">
-          <h1 className="text-xl font-bold text-white">{t('checkpoint.title')}</h1>
-          <p className="text-sm text-[#8a94a6] mt-1">{t('checkpoint.subtitle')}</p>
-          <p className="text-xs text-[#5a677d] mt-1">
-            {user?.name} — {t(`role.${user?.role?.toLowerCase()}`)}
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {isAdmin && (
-            <button
-              onClick={() => selectCheckpoint({ id: 'GLOBAL', name: 'Global Scope' })}
-              className="w-full bg-[#141b28] border border-[#1b2230] hover:border-[#2563eb] rounded-xl p-4 text-left transition-all cursor-pointer group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-lg bg-[#1e3a5f] flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[22px] text-[#60a5fa]">public</span>
-                  </span>
-                  <div>
-                    <div className="text-sm font-bold text-white group-hover:text-[#60a5fa]">
-                      {t('checkpoint.global')}
-                    </div>
-                    <div className="text-xs text-[#5a677d]">Access all checkpoints and analytics</div>
-                  </div>
-                </div>
-                <span className="material-symbols-outlined text-[#5a677d] group-hover:text-[#60a5fa]">arrow_forward</span>
-              </div>
-            </button>
-          )}
-
-          {checkpoints.map((cp) => (
-            <button
-              key={cp.id}
-              onClick={() => selectCheckpoint(cp)}
-              className="w-full bg-[#141b28] border border-[#1b2230] hover:border-[#2563eb] rounded-xl p-4 text-left transition-all cursor-pointer group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-lg bg-[#182133] flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[22px] text-[#94a3b8]">location_on</span>
-                  </span>
-                  <div>
-                    <div className="text-sm font-bold text-white group-hover:text-[#60a5fa]">{cp.name}</div>
-                    {cp.location && <div className="text-xs text-[#5a677d]">{cp.location}</div>}
-                    {cp.type && <div className="text-[10px] text-[#3e4a5c] font-mono">{cp.type}</div>}
-                  </div>
-                </div>
-                <span className="material-symbols-outlined text-[#5a677d] group-hover:text-[#60a5fa]">arrow_forward</span>
-              </div>
-            </button>
-          ))}
-
-          {checkpoints.length === 0 && !isAdmin && (
-            <div className="text-center py-8">
-              <span className="material-symbols-outlined text-[48px] text-[#3e4a5c]">location_off</span>
-              <p className="text-sm text-[#8a94a6] mt-3">{t('checkpoint.none')}</p>
+      <div className="w-full max-w-sm text-center space-y-4" role="status" aria-live="polite">
+        {!error ? (
+          <>
+            <span className="material-symbols-outlined text-[40px] text-[#60a5fa] animate-pulse motion-reduce:animate-none" aria-hidden="true">my_location</span>
+            <h1 className="text-lg font-bold text-white">Finding your checkpoint…</h1>
+            <p className="text-sm text-[#a3aec0]">
+              {user?.name}, allow location access when asked. Only checkpoints assigned to you can be selected.
+            </p>
+          </>
+        ) : (
+          <>
+            <span className="material-symbols-outlined text-[40px] text-[#f87171]" aria-hidden="true">location_off</span>
+            <h1 className="text-lg font-bold text-white">Checkpoint not found</h1>
+            <p className="text-sm text-[#fca5a5]">{error}</p>
+            <div className="flex justify-center gap-2">
+              <button onClick={run} className="px-4 py-2.5 rounded-lg bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-sm font-semibold">Try again</button>
+              <button onClick={logout} className="px-4 py-2.5 rounded-lg bg-[#1e293b] hover:bg-[#273449] text-white text-sm font-semibold">Sign out</button>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

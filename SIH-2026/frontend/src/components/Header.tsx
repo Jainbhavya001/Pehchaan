@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScreenType } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useI18n, Language } from '../contexts/I18nContext';
+import { CheckpointSwitcher } from './CheckpointSwitcher';
 
 interface HeaderProps {
   currentScreen: ScreenType;
@@ -80,9 +81,8 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           {checkpoint && (
-            <div className="hidden sm:flex items-center gap-1.5 ml-3 pl-3 border-l border-[#1b2230] text-[11px]">
-              <span className="material-symbols-outlined text-[14px] text-[#60a5fa]">location_on</span>
-              <span className="text-[#94a3b8] font-medium">{checkpoint.name}</span>
+            <div className="ml-2 pl-2 sm:ml-3 sm:pl-3 border-l border-[#1b2230]">
+              <CheckpointSwitcher />
             </div>
           )}
         </div>

@@ -25,6 +25,15 @@ export interface Checkpoint {
   name: string;
   location?: string;
   type?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  radius_km?: number | null;
+  detection?: {
+    method: 'gps' | 'gps-outside-radius' | 'only-assignment' | 'global' | 'fallback' | 'manual';
+    distanceKm?: number;
+    accuracyM?: number;
+    note: string;
+  };
 }
 
 export type DocumentType =
