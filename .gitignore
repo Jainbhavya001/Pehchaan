@@ -1,103 +1,27 @@
-# Byte-compiled / optimized / DLL files
+# ===========================================================================
+# PEHCHAAN / SIH-2026 — repository ignore rules
+#
+# Single source of truth. The nested SIH-2026/.gitignore and
+# SIH-2026/frontend/.gitignore files were removed: every rule they carried was
+# already covered here, because directory-agnostic patterns such as `.env`,
+# `node_modules/`, `dist/` and `.venv/` match at any depth.
+# ===========================================================================
+
+# --- Byte-compiled / optimised Python --------------------------------
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environments
+# --- Virtual environments --------------------------------------------
 .venv/
 venv/
 env/
-.env
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Build artifacts
-dist/
-build/
-*.egg-info/
-*.whl
-
-# Python packages
-*.egg
-pip-wheel-metadata/
-
-# Test coverage
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-.pnpm-store/
-
-# Vite / Frontend build
-dist/
-build/
-*.local
-
-# Environment files (keep .env.example but not .env)
+# --- Secrets (never commit) -------------------------------------------
 .env
 .env.local
 .env.*.local
 *.env
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Uploads / Generated files
-uploads/
-backend/uploads/
-*.jpg
-*.jpeg
-*.png
-*.pdf
-*.heic
-
-# Model files (large binary files)
-*.pth
-*.onnx
-*.pt
-*.bin
-*.model
-*.weights
-model_manifest.json
-
-# Training outputs
-training/*.json
-training/checkpoints/
-*.metrics.json
-
-# IDE / Editor specific
-*.swp
-*.swo
-*~
-
-# Temporary files
-*.tmp
-*.temp
-tmp/
-
-# Secrets / Keys (never commit)
 *.key
 *.pem
 *.crt
@@ -105,135 +29,149 @@ tmp/
 *.pfx
 secrets/
 
-# Coverage reports
+# --- Node.js -----------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.pnpm-debug.log*
+
+# --- Build output -------------------------------------------------------
+dist/
+build/
+*.egg-info/
+*.whl
+*.egg
+pip-wheel-metadata/
+*.tsbuildinfo
+vite.config.d.ts
+
+# --- Logs ---------------------------------------------------------------
+*.log
+*.log.err
+logs/
+
+# --- Caches -------------------------------------------------------------
+.cache/
+.pytest_cache/
+.tox/
+htmlcov/
 coverage/
 .coverage
 
-# Profiler output
-*.prof
-
-# Docker
-docker-compose.override.yml
-
-# IDE-specific
-.project
-.classpath
-.settings/
-*.iml
-*.ipr
-*.iws
-
-# Misc
+# --- Temporary / backup --------------------------------------------------
+*.tmp
+*.temp
+tmp/
 *.orig
 *.bak
 *.backup
+*~
+*.tgz
+*.tar.gz
+nul
 
-# Frontend specific
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
-frontend/node_modules/
-frontend/dist/
-frontend/build/
-
-# Backend specific
-backend/.env
-backend/.env.local
-backend/.venv/
-backend/__pycache__/
-backend/*.pyc
-backend/.pytest_cache/
-
-# Test artifacts
+# --- Test artifacts -------------------------------------------------------
 *.test.ts
 *.test.js
 *.spec.ts
 *.spec.js
 
-# TypeScript
-*.tsbuildinfo
+# --- Databases ------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
 
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# --- Model weights and training output (large / regenerable) --------------
+*.pth
+*.onnx
+*.pt
+*.bin
+*.model
+*.weights
+model_manifest.json
+training/*.json
+training/checkpoints/
+*.metrics.json
 
-# Cache
-.cache/
+# --- Uploads / generated ---------------------------------------------------
+uploads/
 
-# Misc
-*.tgz
-*.tar.gz
+# --- Profiling / Docker -----------------------------------------------------
+*.prof
+docker-compose.override.yml
 
-# ========== PROJECT SPECIFIC ==========
-# Dataset directories (large binary files)
+# --- OS ---------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# --- Editor / IDE ------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.settings/
+.project
+.classpath
+*.iml
+*.ipr
+*.iws
+
+# ===========================================================================
+# PROJECT SPECIFIC
+# ===========================================================================
+
+# Raw source dataset. The canonical training copy lives in
+# SIH-2026/backend/training/data (902 images); DATASET/ was a byte-identical
+# duplicate of it and has been deleted along with its zip.
 DATASET/
-DATASET.zip
+*.zip
 
-# Document files (templates, presentations, reports)
-*.docx
+# The 902 training images themselves.
+SIH-2026/backend/training/data/
+
+# Generated marketing-video output (its media is never committed).
+SIH-2026/frontend/brag-output/
+
+# Reference and demo ID documents: kept on disk, never committed.
+# sample-data/README.md is tracked; everything else below it stays local.
+SIH-2026/sample-data/**
+!SIH-2026/sample-data/README.md
+
+# Presentations, blank ID templates and chat images parked at the repo root.
 *.pptx
-*.pdf
-
-# Excel/Spreadsheet files
+*.docx
 *.xlsx
 *.xls
 *.csv
-
-# Image files
-*.jpeg
-*.jpg
-*.png
-*.heic
-
-# Temporary/backup files
-*~
-*.tmp
-*.backup
-*.bak
-nul
-
-# OS temporary directories
-%TEMP%/
-%USERPROFILE%/
-
-# IDE/Editor directories
-_removed_apisetu/
-
-# Zip archives
-*.zip
-
-# Large reference files
-reference file.pdf
-
-# Session reports and markdown docs (if not needed in repo)
-Pehchaan-Session-Report.md
-SESSION-SUMMARY.md
-PROJECT-STATUS.md
-BIBLIOGRAPHY.md
-
-# Presentation files
-Pehchaan-SIH2026-Idea-Presentation.pptx
-Pehchaan-SIH2026-Idea-Presentation.pdf
-SIH2026-IDEA-Presentation-Format.pptx
-AI-POWERED PASSPORT AUTHENTICITY ENGINE.pptx
-AI-POWERED PASSPORT AUTHENTICITY ENGINE2.pptx
-AI-POWERED PASSPORT AUTHENTICITY ENGINE (2).pdf
-
-# Other project files
-brutal audit.pdf
-BRUTAL AUDIT.docx
+*.pdf
 4 sawal.docx
 4sawal.pdf
 Aadhaar_Blank_Template.docx
 PAN_Card_Blank_Template.docx
 Passport_Stacked_OneAboveOther.docx
 Synthetic_Indian_Passport_Blank_Template.docx
+BRUTAL AUDIT.docx
+brutal audit.pdf
 passport_template.jpeg
-WhatsApp Image 2026-09-16 at 2.17.10 PM.jpeg
+WhatsApp Image*.jpeg
 mock_government_ids_300_entries.xlsx
+Pehchaan-SIH2026-Idea-Presentation.pdf
+SIH2026-IDEA-Presentation-Format.pptx
+AI-POWERED PASSPORT AUTHENTICITY ENGINE*
 
-# Lock files
+# Status and session documents kept local by decision.
+Pehchaan-Session-Report.md
+SESSION-SUMMARY.md
+PROJECT-STATUS.md
+BIBLIOGRAPHY.md
+
+# Windows reserved name and unexpanded-env-var accidents.
+%TEMP%/
+%USERPROFILE%/
+
+# Office lock files.
 ~$*.pptx
 ~$*.docx
