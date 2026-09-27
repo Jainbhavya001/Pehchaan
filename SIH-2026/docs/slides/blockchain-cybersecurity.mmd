@@ -1,0 +1,128 @@
+%%{init: {
+  'themeVariables': {
+    'primaryColor': '#0059b5',
+    'primaryTextColor': '#ffffff',
+    'primaryBorderColor': '#0059b5',
+    'lineColor': '#717785',
+    'textColor': '#1a1b1f',
+    'fontFamily': 'Inter',
+    'fontSize': '14px',
+    'background': 'transparent',
+    'nodeBorder': '#c1c6d6',
+    'clusterBorder': '#0059b5',
+    'clusterBackground': '#faf8fe',
+    'tertiaryColor': '#006a26',
+    'secondaryColor': '#5f5e60',
+    'errorColor': '#ba1a1a',
+    'warningColor': '#e8a000'
+  },
+  'flowchart': {
+    'curve': 'basis',
+    'nodeSpacing': 50,
+    'rankSpacing': 80,
+    'padding': 30
+  }
+}}%%
+
+flowchart TB
+    %% ===== STYLES =====
+    classDef coreLayer fill:#0059b5,stroke:#0059b5,stroke-width:0,color:#fff,font-weight:700,rx:10,ry:10,padding:14px 20px,font-size:15px
+    classDef chainLayer fill:#006a26,stroke:#006a26,stroke-width:0,color:#fff,font-weight:700,rx:10,ry:10,padding:14px 20px,font-size:15px
+    classDef auditLayer fill:#5f5e60,stroke:#5f5e60,stroke-width:0,color:#fff,font-weight:700,rx:10,ry:10,padding:14px 20px,font-size:15px
+    classDef cryptoLayer fill:#e8a000,stroke:#e8a000,stroke-width:0,color:#1a1b1f,font-weight:700,rx:10,ry:10,padding:14px 20px,font-size:15px
+    classDef featureNode fill:#faf8fe,stroke:#c1c6d6,stroke-width:1.5px,color:#1a1b1f,rx:8,ry:8,padding:12px 16px,font-size:12px,font-weight:500
+    classDef featureNodeAccent fill:#eef3ff,stroke:#0059b5,stroke-width:2px,color:#0059b5,rx:8,ry:8,padding:12px 16px,font-size:12px,font-weight:600
+    classDef featureNodeGreen fill:#f1ffec,stroke:#006a26,stroke-width:2px,color:#006a26,rx:8,ry:8,padding:12px 16px,font-size:12px,font-weight:600
+    classDef featureNodeAmber fill:#fff8e1,stroke:#e8a000,stroke-width:2px,color:#e8a000,rx:8,ry:8,padding:12px 16px,font-size:12px,font-weight:600
+    classDef featureNodeRed fill:#ffdad6,stroke:#ba1a1a,stroke-width:2px,color:#ba1a1a,rx:8,ry:8,padding:12px 16px,font-size:12px,font-weight:600
+
+    %% ===== LAYER HEADERS =====
+    CH["🔗 HASH-CHAINED IMMUTABLE LEDGER\n(Blockchain-Inspired Architecture)"]
+    AU["📜 HMAC-SIGNED AUDIT TRAIL\n(Non-Repudiation & Integrity)"]
+    CR["🔐 CRYPTOGRAPHIC PRIMITIVES\n(Hashing, Signing, Encryption)"]
+    AP["🛡️ APPLICATION SECURITY\n(Auth, RBAC, Transport, Input)"]
+    OF["⚡ OFFLINE-FIRST RESILIENCE\n(Store-and-Forward Architecture)"]
+
+    %% ===== HASH CHAIN LAYER =====
+    C1["Genesis Block\nSHA-256(PEHCHAAN_GENESIS_BLOCK_v1_SIH26188)"]
+    C2["Block #N: Scan Record\nprev_hash + scan_data → SHA-256"]
+    C3["Block #N+1: Next Scan\nChained via prev_hash"]
+    C4["Chain Integrity Verification\nRecompute & Compare Full Hash"]
+    C5["Block Height & Hash Proof\n#1234 | 0xabcd...ef12"]
+    C6["Forgery Registry\nMerkle Root Anchoring"]
+
+    %% ===== AUDIT TRAIL LAYER =====
+    A1["Every Action Logged\nScan, Decision, Login, Config"]
+    A2["HMAC-SHA256 Signature\nKeyed by HMAC_SECRET"]
+    A3["Timing-Safe Verification\nPrevents Timing Attacks"]
+    A4["Legacy Signature Detection\nAuto-flags Old Keys"]
+    A5["Audit Log Query by Target\nFull History per Document"]
+    A6["System Logs Table\nActor, Role, Event, Status"]
+
+    %% ===== CRYPTO LAYER =====
+    K1["SHA-256 Hash Chain\nprev_hash → current_hash"]
+    K2["HMAC-SHA256 Audit Signing\nAction + Context → Signature"]
+    K3["Document Number Hashing\nSHA-256(doc_number) → Storage"]
+    K4["bcrypt Cost-12 Passwords\nSalted, Adaptive Work Factor"]
+    K5["JWT HS256 Tokens\nStateless Auth with Expiry"]
+    K6["TLS 1.3 / HTTPS\nNeon PG + Express Server"]
+
+    %% ===== APP SEC LAYER =====
+    S1["Role-Based Access Control\nADMIN | POST_INCHARGE | OFFICER"]
+    S2["Checkpoint-Scoped Data\nOfficer sees only assigned CP"]
+    S3["Input Sanitization\nXSS Prevention, Length Limits"]
+    S4["Rate Limiting\nPer-IP / Per-User Windows"]
+    S5["Helmet.js Security Headers\nCSP, HSTS, X-Frame, etc."]
+    S6["Secure Cookie Config\nHttpOnly, SameSite, Secure"]
+
+    %% ===== OFFLINE LAYER =====
+    O1["Local In-Memory Queue\nWhen Neon Unreachable"]
+    O2["Automatic Sync on Reconnect\nBatch Insert with Ordering"]
+    O3["Conflict-Free Replication\nHash-Based Deduplication"]
+    O4["Remote Location Ready\nLow-Bandwidth Border Posts"]
+    O5["Telemetry & Health\nSync Status, Queue Depth"]
+
+    %% ===== CONNECTIONS =====
+    CH -->|"Each scan creates\nblock N+1"| C1
+    C1 --> C2 --> C3
+    C3 --> C4
+    C2 --> C5
+    C4 --> C6
+
+    AU --> A1 --> A2 --> A3
+    A2 --> A4
+    A1 --> A5
+    A5 --> A6
+
+    CR --> K1 & K2 & K3 & K4 & K5 & K6
+
+    AP --> S1 & S2 & S3 & S4 & S5 & S6
+
+    OF --> O1 & O2 & O3 & O4 & O5
+
+    %% Cross-layer connections
+    C2 -.->|"Includes\nscan hash"| A1
+    K2 -.->|"Signs\naudit entry"| A2
+    K3 -.->|"Protects\nPII in DB"| C2
+    K4 -.->|"Secures\nuser creds"| S1
+    K5 -.->|"Enables\nstateless auth"| S2
+    O2 -.->|"Preserves\nchain order"| C2
+
+    %% CLASS ASSIGNMENTS
+    class CH coreLayer
+    class AU auditLayer
+    class CR cryptoLayer
+    class AP cryptoLayer
+    class OF coreLayer
+
+    class C1,C2,C3,C4,C5,C6 featureNode
+    class A1,A2,A3,A4,A5,A6 featureNode
+    class K1,K2,K3,K4,K5,K6 featureNode
+    class S1,S2,S3,S4,S5,S6 featureNode
+    class O1,O2,O3,O4,O5 featureNode
+
+    class C1,C2,C3,C4,C5,C6 featureNodeAccent
+    class A1,A2,A3,A4,A5,A6 featureNodeGreen
+    class K1,K2,K3,K4,K5,K6 featureNodeAmber
+    class S1,S2,S3,S4,S5,S6 featureNodeRed
+    class O1,O2,O3,O4,O5 featureNodeAccent

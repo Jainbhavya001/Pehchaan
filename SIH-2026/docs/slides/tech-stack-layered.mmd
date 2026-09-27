@@ -1,0 +1,135 @@
+%%{init: {
+  'themeVariables': {
+    'primaryColor': '#0059b5',
+    'primaryTextColor': '#ffffff',
+    'primaryBorderColor': '#0059b5',
+    'lineColor': '#717785',
+    'textColor': '#1a1b1f',
+    'fontFamily': 'Inter',
+    'fontSize': '14px',
+    'background': 'transparent',
+    'nodeBorder': '#c1c6d6',
+    'clusterBorder': '#0059b5',
+    'clusterBackground': '#faf8fe',
+    'tertiaryColor': '#006a26',
+    'secondaryColor': '#5f5e60'
+  },
+  'flowchart': {
+    'curve': 'linear',
+    'nodeSpacing': 50,
+    'rankSpacing': 80,
+    'padding': 40
+  }
+}}%%
+
+flowchart TB
+    %% ===== STYLES =====
+    classDef layerHeader fill:#0059b5,stroke:#0059b5,stroke-width:0,color:#fff,font-weight:700,rx:8,ry:8,padding:14px 24px,font-size:16px
+    classDef layerHeaderGreen fill:#006a26,stroke:#006a26,stroke-width:0,color:#fff,font-weight:700,rx:8,ry:8,padding:14px 24px,font-size:16px
+    classDef layerHeaderGray fill:#5f5e60,stroke:#5f5e60,stroke-width:0,color:#fff,font-weight:700,rx:8,ry:8,padding:14px 24px,font-size:16px
+    classDef techTile fill:#faf8fe,stroke:#c1c6d6,stroke-width:1.5px,color:#1a1b1f,rx:8,ry:8,padding:12px 18px,font-size:13px,font-weight:500
+    classDef techTileAccent fill:#eef3ff,stroke:#0059b5,stroke-width:2px,color:#0059b5,rx:8,ry:8,padding:12px 18px,font-size:13px,font-weight:600
+    classDef techTileGreen fill:#f1ffec,stroke:#006a26,stroke-width:2px,color:#006a26,rx:8,ry:8,padding:12px 18px,font-size:13px,font-weight:600
+
+    %% ===== NODES: Layer headers =====
+    FH["🌐 FRONTEND"]
+    AH["🔌 API GATEWAY"]
+    BH["⚙️ BACKEND SERVICES"]
+    CH["🧠 AI / ML & COMPUTER VISION"]
+    DH["🗄️ DATABASE & INFRASTRUCTURE"]
+
+    %% ===== FRONTEND TECHNOLOGIES =====
+    F1["React 18"]
+    F2["TypeScript 5.8"]
+    F3["Vite 6"]
+    F4["Tailwind CSS v4"]
+    F5["Framer Motion"]
+    F6["Recharts 3"]
+    F7["Lucide React"]
+    F8["PWA (Workbox)"]
+
+    %% ===== API GATEWAY TECHNOLOGIES =====
+    A1["Express.js 4.21"]
+    A2["JWT Auth (jsonwebtoken)"]
+    A3["Helmet Security"]
+    A4["Neon Serverless Driver"]
+    A5["Hash-Chained Records"]
+    A6["HMAC Audit Logs"]
+
+    %% ===== BACKEND SERVICES TECHNOLOGIES =====
+    B1["FastAPI 0.115"]
+    B2["Uvicorn 0.30"]
+    B3["Pydantic 2.9"]
+    B4["bcrypt 4.1"]
+    B5["PyJWT 2.8"]
+    B6["python-multipart"]
+    B7["psycopg 3.2"]
+
+    %% ===== AI/ML & CV TECHNOLOGIES =====
+    C1["OpenCV 4.10 (YuNet + SFace)"]
+    C2["PyTorch 2.0 + TorchVision"]
+    C3["MobileNetV2 Classifier"]
+    C4["Tesseract 5 OCR (eng/hin/nep)"]
+    C5["NumPy 1.26 + Pillow 10"]
+    C6["MRZ Parser (ICAO 9303)"]
+    C7["ELA + Copy-Move Detection"]
+
+    %% ===== DATABASE & INFRA TECHNOLOGIES =====
+    D1["PostgreSQL (Neon Serverless)"]
+    D2["Docker Containerization"]
+    D3["Hash-Chained Scan Records"]
+    D4["HMAC-Signed Audit Trail"]
+    D5["PWA Offline Support"]
+    D6["Vite + esbuild Production Build"]
+
+    %% ===== LAYOUT: Vertical stacking with subgraphs for grouping =====
+    subgraph L1[" "]
+        direction LR
+        FH
+        F1 & F2 & F3 & F4 & F5 & F6 & F7 & F8
+    end
+
+    subgraph L2[" "]
+        direction LR
+        AH
+        A1 & A2 & A3 & A4 & A5 & A6
+    end
+
+    subgraph L3[" "]
+        direction LR
+        BH
+        B1 & B2 & B3 & B4 & B5 & B6 & B7
+    end
+
+    subgraph L4[" "]
+        direction LR
+        CH
+        C1 & C2 & C3 & C4 & C5 & C6 & C7
+    end
+
+    subgraph L5[" "]
+        direction LR
+        DH
+        D1 & D2 & D3 & D4 & D5 & D6
+    end
+
+    %% ===== INVISIBLE EDGES FOR VERTICAL FLOW =====
+    FH ~~~ AH
+    AH ~~~ BH
+    BH ~~~ CH
+    CH ~~~ DH
+
+    %% ===== CLASS ASSIGNMENTS =====
+    class FH,AH,BH layerHeader
+    class CH layerHeaderGreen
+    class DH layerHeaderGray
+
+    class F1,F2,F3,F4,F5,F6,F7,F8 techTile
+    class A1,A2,A3,A4,A5,A6 techTile
+    class B1,B2,B3,B4,B5,B6,B7 techTile
+    class C1,C2,C3,C4,C5,C6,C7 techTile
+    class D1,D2,D3,D4,D5,D6 techTile
+
+    %% Accent key technologies
+    class F1,F4,A4,B1,C1,C3,C4,D1 techTileAccent
+    class C2,C7 techTileGreen

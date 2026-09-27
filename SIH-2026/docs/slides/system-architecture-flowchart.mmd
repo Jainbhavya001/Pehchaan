@@ -1,0 +1,104 @@
+%%{init: {
+  'themeVariables': {
+    'primaryColor': '#0059b5',
+    'primaryTextColor': '#ffffff',
+    'primaryBorderColor': '#0059b5',
+    'lineColor': '#717785',
+    'textColor': '#1a1b1f',
+    'fontFamily': 'Inter',
+    'fontSize': '16px',
+    'background': 'transparent',
+    'nodeBorder': '#717785',
+    'clusterBorder': '#0059b5',
+    'clusterBackground': '#faf8fe',
+    'tertiaryColor': '#006a26',
+    'tertiaryTextColor': '#ffffff',
+    'errorColor': '#ba1a1a',
+    'errorTextColor': '#ffffff',
+    'warningColor': '#e8a000',
+    'warningTextColor': '#1a1b1f'
+  },
+  'flowchart': {
+    'curve': 'basis',
+    'nodeSpacing': 60,
+    'rankSpacing': 80,
+    'padding': 20
+  }
+}}%%
+
+flowchart LR
+    %% ===== STYLES =====
+    classDef inputNode fill:#faf8fe,stroke:#0059b5,stroke-width:2px,color:#1a1b1f,font-weight:600,rx:12,ry:12,padding:16px
+    classDef apiNode fill:#0059b5,stroke:#0059b5,stroke-width:2px,color:#ffffff,font-weight:600,rx:12,ry:12,padding:16px
+    classDef moduleNode fill:#ffffff,stroke:#717785,stroke-width:1.5px,color:#1a1b1f,rx:10,ry:10,padding:14px
+    classDef decisionNode fill:#faf8fe,stroke:#0059b5,stroke-width:2px,color:#1a1b1f,font-weight:600,rx:12,ry:12,padding:16px
+    classDef verdictClear fill:#006a26,stroke:#006a26,stroke-width:2px,color:#ffffff,font-weight:700,rx:12,ry:12,padding:16px
+    classDef verdictReview fill:#e8a000,stroke:#e8a000,stroke-width:2px,color:#1a1b1f,font-weight:700,rx:12,ry:12,padding:16px
+    classDef verdictRisk fill:#ba1a1a,stroke:#ba1a1a,stroke-width:2px,color:#ffffff,font-weight:700,rx:12,ry:12,padding:16px
+    classDef outputNode fill:#faf8fe,stroke:#0059b5,stroke-width:2px,color:#1a1b1f,font-weight:600,rx:12,ry:12,padding:16px
+    classDef subgraphStyle fill:#faf8fe,stroke:#0059b5,stroke-width:2px,stroke-dasharray: 5 5
+
+    %% ===== NODES =====
+    subgraph INPUT["📥 INPUT"]
+        direction TB
+        A["Officer Uploads\nDocument Image\n+ Optional Live Photo"]
+    end
+
+    subgraph API["🔌 API GATEWAY"]
+        direction TB
+        B["FastAPI\nPOST /scan endpoint"]
+    end
+
+    subgraph PIPELINE["⚙️ SCREENING PIPELINE"]
+        direction TB
+        C["Module 1: OCR Extraction\nTesseract 5 LSTM + MRZ Parser\n+ Field Extractors (Aadhaar/PAN/Passport/DL/Visa)"]
+        D["Module 2: Document Validation\nRules Engine + ICAO 9303 Checks\nExpiry, Check Digits, Cross-field Consistency"]
+        E["Module 3: Tampering Detection\nError Level Analysis (ELA)\n+ ORB Copy-Move + EXIF Metadata"]
+        F["Module 4: Face Verification\nYuNet Detector + SFace Matcher\nCosine Similarity (128-D embedding)"]
+    end
+
+    subgraph DECISION["🎯 RISK DECISION"]
+        direction TB
+        G["Risk Engine\nWeighted Scoring\nValidation(30%) + Tampering(35%)\n+ Face(20%) + Records(15%)"]
+        H{"Final Verdict\n0–100 Score"}
+    end
+
+    subgraph VERDICTS["📊 VERDICT BANDS"]
+        direction LR
+        I["✅ CLEAR\n0–30"]
+        J["⚠️ REVIEW\n31–65"]
+        K["🔴 HIGH RISK\n66–100"]
+    end
+
+    subgraph OUTPUT["📤 OUTPUT"]
+        direction TB
+        L["React Dashboard\nScreening Report + Evidence Matrix\nAudit Trail + HMAC-signed Logs"]
+    end
+
+    %% ===== EDGES =====
+    A -->|"Upload"| B
+    B -->|"Route to Pipeline"| C
+    C -->|"Extracted Fields + MRZ"| D
+    C -->|"Raw Text + Bounding Boxes"| E
+    B -->|"Parallel: Face Images"| F
+    D -->|"Validation Results"| G
+    E -->|"Tampering Sub-score + Evidence"| G
+    F -->|"Face Similarity Score"| G
+    G -->|"Weighted Score + Breakdown"| H
+    H -->|"Score 0–30"| I
+    H -->|"Score 31–65"| J
+    H -->|"Score 66–100"| K
+    I -->|"Auto-clear"| L
+    J -->|"Officer Review"| L
+    K -->|"Immediate Flag"| L
+
+    %% ===== CLASS ASSIGNMENTS =====
+    class A inputNode
+    class B apiNode
+    class C,D,E,F moduleNode
+    class G,H decisionNode
+    class I verdictClear
+    class J verdictReview
+    class K verdictRisk
+    class L outputNode
+    class INPUT,API,PIPELINE,DECISION,VERDICTS,OUTPUT subgraphStyle
