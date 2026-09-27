@@ -578,6 +578,13 @@ async function startServer() {
     }
   });
 
+  // Anything under /api that no route above matched must 404 as JSON.
+  // Without this it falls through to the SPA fallback below and returns
+  // index.html with a 200, which reads as success to an API client.
+  app.use('/api', (_req, res) => {
+    res.status(404).json({ error: 'Not found' });
+  });
+
   const httpServer = http.createServer(app);
 
   // Vite middleware for development vs Static in production

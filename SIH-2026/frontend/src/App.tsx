@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ScreenType, ScreeningRecord } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { I18nProvider } from './contexts/I18nContext';
@@ -27,9 +27,58 @@ import {
 } from './services/neonSyncService';
 import { trackPageView } from './services/analytics';
 
-function AuthenticatedApp({ onNavigatePage }: { onNavigatePage: (p: PageRoute) => void }) {
+type PageRoute = 'app' | 'privacy' | 'terms' | 'not-found';
+
+const KNOWN_SCREENS: ScreenType[] = [
+  'overview',
+  'new-scan',
+  'screening-report',
+  'audit-trail',
+  'system-health-and-docs',
+  'admin-portal',
+  'officer-status',
+  'system-logs',
+  'security',
+];
+
+interface RouteState {
+  page: PageRoute;
+  screen: ScreenType;
+}
+
+/**
+ * Map a pathname onto the app's screen state. The app keeps its screen in
+ * React state rather than in a router, so the URL is only ever a mirror of
+ * that state - but it has to be a *faithful* mirror, otherwise a mistyped or
+ * stale URL silently lands the officer on the overview dashboard instead of
+ * telling them the page does not exist.
+ */
+function parsePath(pathname: string): RouteState {
+  const path = pathname.replace(/\/+$/, '') || '/';
+  if (path === '/') return { page: 'app', screen: 'overview' };
+  if (path === '/privacy') return { page: 'privacy', screen: 'overview' };
+  if (path === '/terms') return { page: 'terms', screen: 'overview' };
+  const segment = path.slice(1);
+  if ((KNOWN_SCREENS as string[]).includes(segment)) {
+    return { page: 'app', screen: segment as ScreenType };
+  }
+  return { page: 'not-found', screen: 'overview' };
+}
+
+function pathForScreen(screen: ScreenType): string {
+  return screen === 'overview' ? '/' : `/${screen}`;
+}
+
+function AuthenticatedApp({
+  screen,
+  onNavigate,
+  onNavigatePage,
+}: {
+  screen: ScreenType;
+  onNavigate: (path: string) => void;
+  onNavigatePage: (p: PageRoute) => void;
+}) {
   const { user, checkpoint, isAuthenticated, isLoading, isAdmin, hasRole, token } = useAuth();
-  const [currentScreen, setCurrentScreen] = useState<ScreenType>('overview');
   const [records, setRecords] = useState<ScreeningRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<ScreeningRecord | null>(null);
   const [scansCount, setScansCount] = useState<number>(0);
@@ -76,27 +125,34 @@ function AuthenticatedApp({ onNavigatePage }: { onNavigatePage: (p: PageRoute) =
     setScansCount((prev) => prev + 1);
   };
 
-  const canAccess = (screen: ScreenType): boolean => {
+  const canAccess = (target: ScreenType): boolean => {
     if (isAdmin) return true;
     const officerScreens: ScreenType[] = ['overview', 'new-scan', 'screening-report'];
     const inchargeScreens: ScreenType[] = ['overview', 'officer-status', 'screening-report', 'audit-trail'];
-    if (user?.role === 'OFFICER') return officerScreens.includes(screen);
-    if (user?.role === 'POST_INCHARGE') return inchargeScreens.includes(screen);
+    if (user?.role === 'OFFICER') return officerScreens.includes(target);
+    if (user?.role === 'POST_INCHARGE') return inchargeScreens.includes(target);
     return false;
   };
 
-  const safeNavigate = (screen: ScreenType) => {
-    if (canAccess(screen)) {
-      setCurrentScreen(screen);
+  const safeNavigate = (next: ScreenType) => {
+    if (canAccess(next)) {
+      onNavigate(pathForScreen(next));
       setIsMobileMenuOpen(false);
-      trackPageView(screen);
+      trackPageView(next);
     }
   };
+
+  // A URL the officer's role does not cover, or a report with nothing to
+  // show, renders the 404 page rather than an unexplained blank panel.
+  const blockedByRole = !canAccess(screen);
+  const reportMissingRecord =
+    screen === 'screening-report' && recordsLoaded && !selectedRecord;
+  const showNotFound = blockedByRole || reportMissingRecord;
 
   return (
     <div className="min-h-screen bg-[#0c1017] text-[#f1f5f9] flex flex-col antialiased selection:bg-[#2563eb]/40">
       <Header
-        currentScreen={currentScreen}
+        currentScreen={screen}
         onNavigate={safeNavigate}
         scansCount={scansCount}
         isMobileMenuOpen={isMobileMenuOpen}
@@ -107,70 +163,70 @@ function AuthenticatedApp({ onNavigatePage }: { onNavigatePage: (p: PageRoute) =
 
       <div className="flex-1 flex overflow-hidden relative">
         <Sidebar
-          currentScreen={currentScreen}
+          currentScreen={screen}
           onNavigate={safeNavigate}
           isMobileOpen={isMobileMenuOpen}
           onCloseMobile={() => setIsMobileMenuOpen(false)}
         />
 
         <main className="flex-1 overflow-y-auto bg-[#faf8fe] text-[#1a1b1f] pb-16 lg:pb-0">
-          {currentScreen === 'overview' && (
-            <OverviewView
-              records={records}
-              onNavigate={safeNavigate}
-              onSelectRecord={setSelectedRecord}
-            />
-          )}
+          {showNotFound ? (
+            <NotFoundView onGoHome={() => onNavigate('/')} />
+          ) : (
+            <>
+              {screen === 'overview' && (
+                <OverviewView
+                  records={records}
+                  onNavigate={safeNavigate}
+                  onSelectRecord={setSelectedRecord}
+                />
+              )}
 
-          {currentScreen === 'new-scan' && canAccess('new-scan') && (
-            <NewScanView
-              onNavigate={safeNavigate}
-              onAddRecord={handleAddRecord}
-              onSelectRecord={setSelectedRecord}
-            />
-          )}
+              {screen === 'new-scan' && (
+                <NewScanView
+                  onNavigate={safeNavigate}
+                  onAddRecord={handleAddRecord}
+                  onSelectRecord={setSelectedRecord}
+                />
+              )}
 
-          {currentScreen === 'screening-report' && selectedRecord && (
-            <ScreeningReportView
-              currentRecord={selectedRecord}
-              records={records}
-              onSelectRecord={setSelectedRecord}
-              onNavigate={safeNavigate}
-            />
-          )}
+              {screen === 'screening-report' && selectedRecord && (
+                <ScreeningReportView
+                  currentRecord={selectedRecord}
+                  records={records}
+                  onSelectRecord={setSelectedRecord}
+                  onNavigate={safeNavigate}
+                />
+              )}
 
-          {currentScreen === 'audit-trail' && canAccess('audit-trail') && (
-            <AuditTrailView
-              records={records}
-              onSelectRecord={setSelectedRecord}
-              onNavigate={safeNavigate}
-            />
-          )}
+              {screen === 'audit-trail' && (
+                <AuditTrailView
+                  records={records}
+                  onSelectRecord={setSelectedRecord}
+                  onNavigate={safeNavigate}
+                />
+              )}
 
-          {currentScreen === 'system-health-and-docs' && canAccess('system-health-and-docs') && (
-            <SystemHealthDocsView />
-          )}
+              {screen === 'system-health-and-docs' && <SystemHealthDocsView />}
 
-          {currentScreen === 'admin-portal' && canAccess('admin-portal') && (
-            <AdminPortalView onNavigate={safeNavigate} records={records} />
-          )}
+              {screen === 'admin-portal' && (
+                <AdminPortalView onNavigate={safeNavigate} records={records} />
+              )}
 
-          {currentScreen === 'officer-status' && canAccess('officer-status') && (
-            <OfficerStatusView records={records} onNavigate={safeNavigate} />
-          )}
+              {screen === 'officer-status' && (
+                <OfficerStatusView records={records} onNavigate={safeNavigate} />
+              )}
 
-          {currentScreen === 'security' && canAccess('security') && (
-            <SecurityView records={records} />
-          )}
+              {screen === 'security' && <SecurityView records={records} />}
 
-          {currentScreen === 'system-logs' && canAccess('system-logs') && (
-            <SystemLogsView />
+              {screen === 'system-logs' && <SystemLogsView />}
+            </>
           )}
         </main>
       </div>
 
       <MobileBottomNav
-        currentScreen={currentScreen}
+        currentScreen={screen}
         onNavigate={safeNavigate}
         onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
       />
@@ -178,18 +234,39 @@ function AuthenticatedApp({ onNavigatePage }: { onNavigatePage: (p: PageRoute) =
   );
 }
 
-type PageRoute = 'app' | 'privacy' | 'terms';
-
 export default function App() {
-  const [page, setPage] = useState<PageRoute>('app');
+  const [route, setRoute] = useState<RouteState>(() =>
+    parsePath(window.location.pathname),
+  );
+
+  // Keep state and URL in step when the user moves through history.
+  useEffect(() => {
+    const onPopState = () => setRoute(parsePath(window.location.pathname));
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const go = useCallback((path: string) => {
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+    setRoute(parsePath(path));
+  }, []);
 
   return (
     <I18nProvider>
       <AuthProvider>
-        {page === 'privacy' && <PrivacyPolicyView onBack={() => setPage('app')} />}
-        {page === 'terms' && <TermsView onBack={() => setPage('app')} />}
-        {page === 'app' && <AuthenticatedApp onNavigatePage={setPage} />}
-        <CookieConsent onPrivacyClick={() => setPage('privacy')} />
+        {route.page === 'privacy' && <PrivacyPolicyView onBack={() => go('/')} />}
+        {route.page === 'terms' && <TermsView onBack={() => go('/')} />}
+        {route.page === 'not-found' && <NotFoundView onGoHome={() => go('/')} />}
+        {route.page === 'app' && (
+          <AuthenticatedApp
+            screen={route.screen}
+            onNavigate={go}
+            onNavigatePage={(p) => go(p === 'privacy' ? '/privacy' : '/terms')}
+          />
+        )}
+        <CookieConsent onPrivacyClick={() => go('/privacy')} />
       </AuthProvider>
     </I18nProvider>
   );
